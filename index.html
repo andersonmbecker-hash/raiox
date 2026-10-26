@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Raio-X da Bio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+  <style>
+    :root {
+      --bg:      #08090e;
+      --surface: #0f1117;
+      --card:    #13161f;
+      --border:  #1e2333;
+      --accent:  #6366f1;
+      --accent2: #818cf8;
+      --fg:      #f1f5f9;
+      --fg2:     #94a3b8;
+      --fg3:     #475569;
+      --gold:    #f0b429;
+      --green:   #22c55e;
+      --radius:  14px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── BG decoration ── */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(ellipse, rgba(99,102,241,.18) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px 60px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── Brand ── */
+    .brand {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .brand-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 14px;
+    }
+    .brand-icon {
+      font-size: 48px;
+      line-height: 1;
+      margin-bottom: 16px;
+      display: block;
+    }
+    .brand h1 {
+      font-size: clamp(28px, 6vw, 44px);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -.02em;
+      background: linear-gradient(135deg, #f1f5f9 30%, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+    }
+    .brand p {
+      font-size: 16px;
+      color: var(--fg2);
+      max-width: 420px;
+      line-height: 1.6;
+    }
+
+    /* ── O que você vai receber ── */
+    .pills {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 24px 0 40px;
+    }
+    .pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 50px;
+      background: rgba(99,102,241,.12);
+      border: 1px solid rgba(99,102,241,.25);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent2);
+    }
+
+    /* ── Form card ── */
+    .form-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px 28px;
+    }
+
+    .form-card h2 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .form-card p {
+      font-size: 13px;
+      color: var(--fg2);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--fg2);
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .field input {
+      width: 100%;
+      padding: 11px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 15px;
+      color: var(--fg);
+      font-family: inherit;
+      outline: none;
+      transition: border-color .15s;
+    }
+    .field input:focus {
+      border-color: var(--accent);
+    }
+    .field input::placeholder { color: var(--fg3); }
+
+    .btn-start {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: inherit;
+      margin-top: 8px;
+      transition: background .15s, transform .1s;
+      letter-spacing: .01em;
+    }
+    .btn-start:hover { background: #5254cc; }
+    .btn-start:active { transform: scale(.98); }
+    .btn-start:disabled { opacity: .5; cursor: not-allowed; }
+
+    .email-note {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      padding: 10px 14px;
+      background: rgba(240,180,41,.06);
+      border: 1px solid rgba(240,180,41,.18);
+      border-radius: 8px;
+      font-size: 12px;
+      color: #d9a827;
+      line-height: 1.4;
+    }
+    .email-note span { flex: 1; }
+
+    .error-msg {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #f87171;
+      text-align: center;
+      display: none;
+    }
+
+    footer {
+      text-align: center;
+      padding: 24px 16px;
+      font-size: 12px;
+      color: var(--fg3);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="brand">
+      <p class="brand-label">Buzina Digital</p>
+      <span class="brand-icon">🎯</span>
+      <h1>Raio-X da Bio</h1>
+      <p>Descubra qual nota a sua bio merece, o que está faltando e receba 3 sugestões prontas para usar.</p>
+    </div>
+
+    <div class="pills">
+      <div class="pill">📊 Nota de 0 a 10</div>
+      <div class="pill">✍️ 3 Sugestões de bio</div>
+      <div class="pill">📧 Resultado por e-mail</div>
+    </div>
+
+    <div class="form-card">
+      <h2>Vamos começar</h2>
+      <p>Informe seus dados para receber a análise e guardar o resultado no seu e-mail.</p>
+
+      <form id="form-inicio" onsubmit="iniciar(event)">
+        <div class="field">
+          <label for="nome">Seu nome</label>
+          <input type="text" id="nome" placeholder="Como você quer ser chamado?" autocomplete="given-name" required>
+        </div>
+        <div class="field">
+          <label for="email">Seu e-mail</label>
+          <input type="email" id="email" placeholder="voce@email.com" autocomplete="email" required>
+        </div>
+
+        <button type="submit" class="btn-start" id="btn-inicio">
+          Iniciar análise →
+        </button>
+
+        <div class="email-note">
+          <span>📬</span>
+          <span>Você receberá as 3 sugestões e a nota completa no e-mail para consultar quando quiser.</span>
+        </div>
+
+        <p class="error-msg" id="error-msg">Por favor, preencha todos os campos corretamente.</p>
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    &copy; <span id="ano"></span> Buzina Digital — Todos os direitos reservados
+  </footer>
+
+  <script>
+    document.getElementById('ano').textContent = new Date().getFullYear();
+
+    function iniciar(e) {
+      e.preventDefault();
+      const nome  = document.getElementById('nome').value.trim();
+      const email = document.getElementById('email').value.trim();
+
+      if (!nome || !email) {
+        document.getElementById('error-msg').style.display = 'block';
+        return;
+      }
+
+      // Salva no sessionStorage e avança
+      sessionStorage.setItem('raiox_nome',  nome);
+      sessionStorage.setItem('raiox_email', email);
+
+      const btn = document.getElementById('btn-inicio');
+      btn.disabled = true;
+      btn.textContent = 'Carregando…';
+
+      window.location.href = 'perguntas.html';
+    }
+  </script>
+</body>
+</html>

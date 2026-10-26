@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Raio-X da Bio — Resultado</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Barlow+Condensed:wght@600;700;800;900&display=swap">
+  <style>
+    :root {
+      --bg:      #08090e;
+      --surface: #0f1117;
+      --card:    #13161f;
+      --border:  #1e2333;
+      --accent:  #6366f1;
+      --accent2: #818cf8;
+      --fg:      #f1f5f9;
+      --fg2:     #94a3b8;
+      --fg3:     #475569;
+      --gold:    #f0b429;
+      --green:   #22c55e;
+      --red:     #ef4444;
+      --radius:  14px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100dvh;
+    }
+
+    /* ── BG ── */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -300px; left: 50%;
+      transform: translateX(-50%);
+      width: 800px; height: 800px;
+      background: radial-gradient(ellipse, rgba(99,102,241,.15) 0%, transparent 65%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Layout ── */
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 28px 20px 80px;
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+    }
+    .logo {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--accent2);
+    }
+    .email-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      background: rgba(34,197,94,.1);
+      border: 1px solid rgba(34,197,94,.2);
+      border-radius: 50px;
+      font-size: 11px;
+      color: #4ade80;
+      font-weight: 600;
+    }
+
+    /* ════════════════════════════════════════════
+       FIFA CARD
+    ════════════════════════════════════════════ */
+    .fifa-card {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 32px;
+      background: linear-gradient(160deg, #1a1040 0%, #0d0d1f 40%, #111827 100%);
+      border: 1px solid rgba(99,102,241,.25);
+      box-shadow: 0 0 60px rgba(99,102,241,.12), 0 20px 60px rgba(0,0,0,.6);
+    }
+
+    /* shimmer accent top */
+    .fifa-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+    }
+
+    .card-inner {
+      padding: 28px 28px 32px;
+    }
+
+    /* top row */
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+
+    .card-score-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .card-score-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.4);
+    }
+    .card-score-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 72px;
+      font-weight: 900;
+      line-height: .9;
+      letter-spacing: -.02em;
+      color: var(--gold);
+      text-shadow: 0 0 30px rgba(240,180,41,.4);
+    }
+    .card-score-denom {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(255,255,255,.3);
+      letter-spacing: .08em;
+    }
+
+    /* radar in card */
+    .card-radar {
+      flex-shrink: 0;
+    }
+
+    /* stats row at bottom of card */
+    .card-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 2px;
+    }
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px 8px;
+      background: rgba(255,255,255,.04);
+      border-radius: 8px;
+    }
+    .stat-item:first-child { border-radius: 8px 4px 4px 8px; }
+    .stat-item:last-child  { border-radius: 4px 8px 8px 4px; }
+    .stat-val {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 28px;
+      font-weight: 900;
+      line-height: 1;
+      color: #fff;
+    }
+    .stat-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.4);
+      margin-top: 4px;
+    }
+
+    /* card divider */
+    .card-divider {
+      height: 1px;
+      background: rgba(255,255,255,.07);
+      margin: 20px 0;
+    }
+
+    /* name row */
+    .card-name-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: #fff;
+    }
+    .card-brand {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.25);
+    }
+
+    /* ════════════════════════════════════════════
+       ANÁLISE
+    ════════════════════════════════════════════ */
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--fg3);
+      margin-bottom: 12px;
+    }
+    .analise-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      font-size: 14px;
+      color: var(--fg2);
+      line-height: 1.75;
+      margin-bottom: 28px;
+    }
+
+    /* ════════════════════════════════════════════
+       SUGESTÕES
+    ════════════════════════════════════════════ */
+    .sugestoes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+    .sugestao-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      transition: border-color .15s;
+    }
+    .sugestao-card:hover { border-color: rgba(99,102,241,.35); }
+
+    .sugestao-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .sugestao-tipo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sugestao-tipo .tipo-badge {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 50px;
+      background: rgba(99,102,241,.15);
+      color: var(--accent2);
+    }
+    .sugestao-subtitulo {
+      font-size: 12px;
+      color: var(--fg3);
+    }
+    .sugestao-texto {
+      font-size: 15px;
+      color: var(--fg);
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+    .char-info {
+      font-size: 11px;
+      color: var(--fg3);
+      margin-bottom: 10px;
+    }
+    .char-info .ok  { color: var(--green); }
+    .char-info .warn { color: var(--gold); }
+
+    .btn-copiar {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      background: transparent;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      color: var(--fg2);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color .15s, color .15s;
+    }
+    .btn-copiar:hover { border-color: var(--accent2); color: var(--accent2); }
+    .btn-copiar.copied { border-color: var(--green); color: var(--green); }
+
+    /* ════════════════════════════════════════════
+       EMAIL SENT
+    ════════════════════════════════════════════ */
+    .email-sent-banner {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 16px 18px;
+      background: rgba(34,197,94,.07);
+      border: 1px solid rgba(34,197,94,.2);
+      border-radius: var(--radius);
+      margin-bottom: 28px;
+    }
+    .email-sent-banner .icon { font-size: 20px; flex-shrink: 0; }
+    .email-sent-banner p {
+      font-size: 13px;
+      color: #86efac;
+      line-height: 1.5;
+    }
+    .email-sent-banner strong { color: #4ade80; display: block; margin-bottom: 2px; font-size: 14px; }
+
+    /* ── CTA MCI ── */
+    .cta-mci {
+      background: linear-gradient(135deg, #1a1040 0%, #0d0d1f 60%, #111827 100%);
+      border: 1px solid rgba(99,102,241,.3);
+      border-radius: var(--radius);
+      padding: 28px 24px 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-mci::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+    }
+    .cta-mci .cta-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 12px;
+    }
+    .cta-mci h3 {
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1.25;
+      letter-spacing: -.01em;
+      color: var(--fg);
+      margin-bottom: 12px;
+    }
+    .cta-mci p {
+      font-size: 14px;
+      color: var(--fg2);
+      line-height: 1.7;
+      margin-bottom: 22px;
+      max-width: 440px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .btn-mci {
+      display: inline-block;
+      padding: 14px 28px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      border-radius: 10px;
+      text-decoration: none;
+      letter-spacing: .01em;
+      transition: background .15s, transform .1s;
+    }
+    .btn-mci:hover { background: #5254cc; }
+    .btn-mci:active { transform: scale(.98); }
+    .cta-mci .cta-fine {
+      font-size: 11px;
+      color: var(--fg3);
+      margin-top: 12px;
+      margin-bottom: 0;
+    }
+
+    /* ── Loading ── */
+    #loading-screen {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      z-index: 999;
+    }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loading-screen p { font-size: 14px; color: var(--fg3); }
+
+    /* ── Error ── */
+    #error-screen {
+      display: none;
+      text-align: center;
+      padding: 80px 24px;
+    }
+    #error-screen h2 { margin-bottom: 8px; }
+    #error-screen p { color: var(--fg2); margin-bottom: 24px; font-size: 14px; }
+  </style>
+</head>
+<body>
+
+  <div id="loading-screen">
+    <div class="spinner"></div>
+    <p>Carregando resultado…</p>
+  </div>
+
+  <div id="error-screen">
+    <h2>Ops, resultado não encontrado</h2>
+    <p>Parece que a sessão expirou. Faça a análise novamente.</p>
+    <a href="index.html" class="btn-refazer">Fazer nova análise</a>
+  </div>
+
+  <div class="page" id="main-content" style="display:none">
+
+    <div class="header">
+      <div class="logo">🎯 Raio-X da Bio</div>
+      <div class="email-badge" id="email-badge">📧 Enviado por e-mail</div>
+    </div>
+
+    <!-- ░░ FIFA CARD ░░ -->
+    <div class="fifa-card">
+      <div class="card-inner">
+
+        <div class="card-top">
+          <div class="card-score-block">
+            <div class="card-score-label">Score</div>
+            <div class="card-score-num" id="score-num">—</div>
+            <div class="card-score-denom">de 10</div>
+          </div>
+          <!-- Radar SVG gerado por JS -->
+          <div class="card-radar">
+            <svg id="radar-svg" width="160" height="160" viewBox="0 0 160 160"></svg>
+          </div>
+        </div>
+
+        <div class="card-divider"></div>
+
+        <div class="card-stats">
+          <div class="stat-item">
+            <div class="stat-val" id="stat-com">—</div>
+            <div class="stat-label">Comunicação</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-val" id="stat-ide">—</div>
+            <div class="stat-label">Identificação</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-val" id="stat-cla">—</div>
+            <div class="stat-label">Clareza</div>
+          </div>
+        </div>
+
+        <div class="card-divider"></div>
+
+        <div class="card-name-row">
+          <div class="card-name" id="card-nome">—</div>
+          <div class="card-brand">Buzina Digital</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ░░ ANÁLISE ░░ -->
+    <p class="section-title">Análise do método MCI</p>
+    <div class="analise-box" id="analise-texto"></div>
+
+    <!-- ░░ EMAIL BANNER ░░ -->
+    <div class="email-sent-banner" id="email-banner">
+      <div class="icon">📬</div>
+      <p>
+        <strong>Resultado enviado por e-mail!</strong>
+        Você receberá as sugestões e a nota no seu e-mail para consultar quando quiser.
+      </p>
+    </div>
+
+    <!-- ░░ SUGESTÕES ░░ -->
+    <p class="section-title">3 Sugestões de Bio para você</p>
+    <div class="sugestoes-list" id="sugestoes-list"></div>
+
+    <div class="cta-mci">
+      <p class="cta-eyebrow">Próximo passo</p>
+      <h3>Sua bio melhorou. Agora vamos trabalhar o que está por trás dela.</h3>
+      <p>A bio é só a superfície. O MCI (Mapa da Comunicação Intencional) é o documento estratégico que define com precisão o seu posicionamento, sua voz, seu público e a mensagem que move as pessoas certas a te contratarem. Quem faz o MCI para de improvisar e começa a comunicar com intenção.</p>
+      <a href="https://buzinadigital.com.br?utm_source=raiox&utm_medium=resultado_bio&utm_campaign=mci&utm_content=cta_resultado" target="_blank" rel="noopener" class="btn-mci">Agora faça seu Mapa da Comunicação Intencional →</a>
+      <p class="cta-fine">Desenvolvido pela Buzina Digital para profissionais que querem ser encontrados pelos clientes certos.</p>
+    </div>
+
+  </div>
+
+  <script>
+    // ═══════════════════════════════════════════
+    //  RADAR SVG (triângulo FIFA)
+    // ═══════════════════════════════════════════
+    function drawRadar(notas) {
+      const svg = document.getElementById('radar-svg');
+      const cx = 80, cy = 80, R = 62, r_inner = R * 0.2;
+
+      // 3 vértices: topo (comunicação), inf-dir (identificação), inf-esq (clareza)
+      // ângulos: -90° (topo), 30° (direita-baixo), 150° (esquerda-baixo)
+      const angles = [-Math.PI / 2, Math.PI / 6, (5 * Math.PI) / 6];
+      const labels  = ['Comunicação', 'Identificação', 'Clareza'];
+      const vals    = [notas.comunicacao / 10, notas.identificacao / 10, notas.clareza / 10];
+      const nums    = [notas.comunicacao, notas.identificacao, notas.clareza];
+
+      function pt(angle, radius) {
+        return [
+          cx + radius * Math.cos(angle),
+          cy + radius * Math.sin(angle),
+        ];
+      }
+
+      function polyPts(radius) {
+        return angles.map(a => pt(a, radius)).map(([x, y]) => `${x},${y}`).join(' ');
+      }
+
+      let html = '';
+
+      // Web (3 levels)
+      [1, 0.66, 0.33].forEach(frac => {
+        const opacity = frac === 1 ? 0.18 : frac === 0.66 ? 0.1 : 0.06;
+        html += `<polygon points="${polyPts(R * frac)}" fill="none" stroke="rgba(99,102,241,${opacity})" stroke-width="${frac === 1 ? 1 : 0.8}"/>`;
+      });
+
+      // Spokes
+      angles.forEach(a => {
+        const [x2, y2] = pt(a, R);
+        html += `<line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" stroke="rgba(99,102,241,0.12)" stroke-width="0.8"/>`;
+      });
+
+      // Data polygon
+      const dataPts = angles.map((a, i) => pt(a, R * vals[i])).map(([x, y]) => `${x},${y}`).join(' ');
+      html += `<polygon points="${dataPts}" fill="rgba(99,102,241,0.2)" stroke="rgba(129,140,248,0.8)" stroke-width="1.5" stroke-linejoin="round"/>`;
+
+      // Data nodes
+      angles.forEach((a, i) => {
+        const [nx, ny] = pt(a, R * vals[i]);
+        html += `<circle cx="${nx}" cy="${ny}" r="3.5" fill="#818cf8" stroke="none"/>`;
+      });
+
+      // Labels
+      const labelOffset = R + 14;
+      angles.forEach((a, i) => {
+        const [lx, ly] = pt(a, labelOffset);
+        const anchor = lx < cx - 4 ? 'end' : lx > cx + 4 ? 'start' : 'middle';
+        const dyVal  = ly < cy ? '-4' : '10';
+        html += `<text x="${lx}" y="${ly}" text-anchor="${anchor}" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="rgba(255,255,255,0.5)" letter-spacing="0.06em" text-transform="uppercase" dy="${dyVal}" style="text-transform:uppercase">${labels[i].toUpperCase()}</text>`;
+        // nota no nó
+        const [nx, ny] = pt(a, R * vals[i]);
+        const nDy = ny < cy ? '-6' : '14';
+        html += `<text x="${nx}" y="${ny}" dy="${nDy}" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="rgba(255,255,255,0.9)">${nums[i].toFixed(1)}</text>`;
+      });
+
+      svg.innerHTML = html;
+    }
+
+    // ═══════════════════════════════════════════
+    //  SUGESTÕES
+    // ═══════════════════════════════════════════
+    function renderSugestoes(sugestoes) {
+      const container = document.getElementById('sugestoes-list');
+      container.innerHTML = '';
+
+      sugestoes.forEach((s, idx) => {
+        const texto    = s.texto || '';
+        const charLen  = texto.length;
+        const limiteIG = 150;
+        const limiteLI = 300;
+
+        let charInfo = '';
+        const tipo = (s.tipo || '').toLowerCase();
+        if (tipo.includes('instagram')) {
+          const ok = charLen <= limiteIG;
+          charInfo = `<div class="char-info">${charLen} caracteres <span class="${ok ? 'ok' : 'warn'}">${ok ? '✓ dentro do limite' : '⚠ acima do limite Instagram (150)'}</span></div>`;
+        } else if (tipo.includes('linkedin')) {
+          const ok = charLen <= limiteLI;
+          charInfo = `<div class="char-info">${charLen} caracteres <span class="${ok ? 'ok' : 'warn'}">${ok ? '✓ dentro do limite' : '⚠ acima do limite LinkedIn (300)'}</span></div>`;
+        }
+
+        const card = document.createElement('div');
+        card.className = 'sugestao-card';
+        card.innerHTML = `
+          <div class="sugestao-header">
+            <div class="sugestao-tipo">
+              <span class="tipo-badge">${s.tipo || `Opção ${idx + 1}`}</span>
+              ${s.subtitulo ? `<span class="sugestao-subtitulo">${s.subtitulo}</span>` : ''}
+            </div>
+          </div>
+          <p class="sugestao-texto" id="sug-texto-${idx}">${texto}</p>
+          ${charInfo}
+          <button class="btn-copiar" onclick="copiar(${idx})">
+            <span id="copy-icon-${idx}">📋</span>
+            <span id="copy-label-${idx}">Copiar</span>
+          </button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    async function copiar(idx) {
+      const texto = document.getElementById(`sug-texto-${idx}`).textContent;
+      const btn   = document.querySelector(`button[onclick="copiar(${idx})"]`);
+      try {
+        await navigator.clipboard.writeText(texto);
+      } catch {
+        // fallback: select
+        const range = document.createRange();
+        range.selectNode(document.getElementById(`sug-texto-${idx}`));
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+      }
+      btn.classList.add('copied');
+      document.getElementById(`copy-icon-${idx}`).textContent = '✓';
+      document.getElementById(`copy-label-${idx}`).textContent = 'Copiado!';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        document.getElementById(`copy-icon-${idx}`).textContent = '📋';
+        document.getElementById(`copy-label-${idx}`).textContent = 'Copiar';
+      }, 2000);
+    }
+
+    // ═══════════════════════════════════════════
+    //  SCORE COLOR
+    // ═══════════════════════════════════════════
+    function scoreColor(n) {
+      if (n >= 8) return '#f0b429';   // gold
+      if (n >= 6) return '#f59e0b';   // amber
+      return '#ef4444';               // red
+    }
+
+    // ═══════════════════════════════════════════
+    //  INIT
+    // ═══════════════════════════════════════════
+    (function init() {
+      const nome     = sessionStorage.getItem('raiox_nome')  || 'Ana Souza';
+      const email    = sessionStorage.getItem('raiox_email') || 'ana@email.com';
+      const cached   = sessionStorage.getItem('raiox_cached') === '1';
+      const rawRes   = sessionStorage.getItem('raiox_resultado');
+
+      // Dados de demonstração quando não há sessão real
+      const DEMO = {
+        score_geral: 6.3,
+        notas: { comunicacao: 5.5, identificacao: 7.0, clareza: 6.5 },
+        analise: 'Sua bio tem uma boa identificação com o público, mas peca na comunicação direta do serviço. O leitor ainda precisa inferir o que você entrega, quando isso deveria ser explícito nos primeiros 5 palavras. A clareza está acima da média, mas o uso de termos como "transformação holística" introduz jargão que distancia quem ainda não conhece sua área. O elemento pessoal está ausente, o que faz a bio soar como uma ficha técnica.',
+        sugestoes: [
+          { tipo: 'Instagram', subtitulo: 'Direta e poderosa', texto: 'Ajudo mães empreendedoras a lucrar com o próprio negócio. Para quem quer sair do caos financeiro de vez. Manda “LUCRO” no direct.' },
+          { tipo: 'LinkedIn', subtitulo: 'Profissional com humanidade', texto: 'Especialista em finanças para empreendedoras. Já ajudei mais de 200 mulheres a transformar negócios deficitários em fontes reais de renda. Acredito que dinheiro e propósito andam juntos. Mãe de dois, maratonista nas horas vagas.' },
+          { tipo: 'Completa', subtitulo: 'Para site ou apresentações', texto: 'Sou consultora financeira especializada em mulheres que empreenderam por amor, mas precisam aprender a precificar, lucrar e crescer com consistência. Com um método desenvolvido ao longo de 8 anos e mais de 200 alunas atendidas, ajudo empreendedoras a sair do vermelho e construir negócios que sustentam a vida que elas querem viver. Mãe de dois filhos, maratonista e completamente apaixonada por café.' },
+        ],
+      };
+
+      const resultado = rawRes ? JSON.parse(rawRes) : DEMO;
+      const { score_geral, notas, analise, sugestoes } = resultado;
+
+      // Nome no card
+      document.getElementById('card-nome').textContent = (nome || 'Profissional').toUpperCase();
+
+      // Score
+      const scoreEl = document.getElementById('score-num');
+      scoreEl.textContent = typeof score_geral === 'number' ? score_geral.toFixed(1) : '—';
+      scoreEl.style.color = scoreColor(score_geral);
+
+      // Stats
+      document.getElementById('stat-com').textContent = notas?.comunicacao?.toFixed(1) ?? '—';
+      document.getElementById('stat-ide').textContent = notas?.identificacao?.toFixed(1) ?? '—';
+      document.getElementById('stat-cla').textContent = notas?.clareza?.toFixed(1) ?? '—';
+
+      // Análise
+      document.getElementById('analise-texto').textContent = analise || '';
+
+      // Radar
+      if (notas) drawRadar(notas);
+
+      // Sugestões
+      if (Array.isArray(sugestoes)) renderSugestoes(sugestoes);
+
+      // Email badge: se foi cache, resultado já foi enviado antes
+      if (cached) {
+        document.getElementById('email-badge').textContent = '📋 Resultado em cache';
+        document.getElementById('email-banner').innerHTML = `
+          <div class="icon">📋</div>
+          <p>
+            <strong>Análise já realizada anteriormente</strong>
+            Este resultado foi recuperado do nosso cache. O e-mail foi enviado na primeira análise.
+          </p>
+        `;
+      }
+
+      // Show
+      document.getElementById('loading-screen').style.display = 'none';
+      document.getElementById('main-content').style.display = 'block';
+    })();
+  </script>
+</body>
+</html>

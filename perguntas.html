@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Raio-X da Bio — Perguntas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+  <style>
+    :root {
+      --bg:      #08090e;
+      --surface: #0f1117;
+      --card:    #13161f;
+      --border:  #1e2333;
+      --accent:  #6366f1;
+      --accent2: #818cf8;
+      --fg:      #f1f5f9;
+      --fg2:     #94a3b8;
+      --fg3:     #475569;
+      --radius:  14px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Progress bar ── */
+    .progress-bar-wrap {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--border);
+      z-index: 100;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transition: width .4s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* ── Header ── */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px 16px;
+      position: relative;
+      z-index: 10;
+    }
+    .logo {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--accent2);
+    }
+    .step-indicator {
+      font-size: 12px;
+      color: var(--fg3);
+      font-weight: 500;
+    }
+
+    /* ── Main ── */
+    main {
+      flex: 1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 32px 20px 80px;
+    }
+    .steps-container {
+      width: 100%;
+      max-width: 540px;
+      position: relative;
+    }
+
+    /* ── Steps ── */
+    .step {
+      display: none;
+      animation: stepIn .3s ease;
+    }
+    .step.active { display: block; }
+    @keyframes stepIn {
+      from { opacity: 0; transform: translateX(20px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .step-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: rgba(99,102,241,.12);
+      border: 1px solid rgba(99,102,241,.2);
+      border-radius: 50px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent2);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .step h2 {
+      font-size: clamp(20px, 5vw, 26px);
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -.01em;
+      margin-bottom: 8px;
+    }
+    .step .step-desc {
+      font-size: 14px;
+      color: var(--fg2);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    /* ── Fields ── */
+    .field { margin-bottom: 16px; }
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--fg2);
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .field textarea, .field input {
+      width: 100%;
+      padding: 13px 16px;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 15px;
+      color: var(--fg);
+      font-family: inherit;
+      outline: none;
+      resize: vertical;
+      transition: border-color .15s;
+      line-height: 1.55;
+    }
+    .field textarea:focus, .field input:focus {
+      border-color: var(--accent);
+    }
+    .field textarea::placeholder, .field input::placeholder { color: var(--fg3); }
+    .field .char-count {
+      font-size: 11px;
+      color: var(--fg3);
+      text-align: right;
+      margin-top: 5px;
+    }
+    .field .char-count.over { color: #f87171; }
+
+    /* ── Tip ── */
+    .tip {
+      display: flex;
+      gap: 10px;
+      padding: 12px 14px;
+      background: rgba(99,102,241,.07);
+      border: 1px solid rgba(99,102,241,.18);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--fg2);
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+    .tip .tip-icon { flex-shrink: 0; font-size: 16px; margin-top: 1px; }
+
+    /* ── Step 0 (intro) ── */
+    .intro-list {
+      list-style: none;
+      margin: 0 0 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .intro-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--fg2);
+      line-height: 1.5;
+    }
+    .intro-list .num {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(99,102,241,.18);
+      color: var(--accent2);
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ── Nav buttons ── */
+    .nav-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .btn-back {
+      padding: 13px 20px;
+      background: transparent;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      color: var(--fg2);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color .15s, color .15s;
+    }
+    .btn-back:hover { border-color: var(--fg3); color: var(--fg); }
+    .btn-next {
+      flex: 1;
+      padding: 13px;
+      background: var(--accent);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background .15s;
+    }
+    .btn-next:hover { background: #5254cc; }
+    .btn-next:disabled { opacity: .45; cursor: not-allowed; }
+
+    /* ── Loading overlay ── */
+    #loading-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+    #loading-overlay.show { display: flex; }
+    .spinner {
+      width: 44px; height: 44px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loading-overlay p {
+      font-size: 15px;
+      color: var(--fg2);
+      text-align: center;
+    }
+    #loading-overlay strong { color: var(--fg); display: block; margin-bottom: 4px; font-size: 17px; }
+
+    .error-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #7f1d1d;
+      color: #fca5a5;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      z-index: 1000;
+      display: none;
+    }
+    .error-toast.show { display: block; }
+  </style>
+</head>
+<body>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+  </div>
+
+  <header>
+    <div class="logo">🎯 Raio-X da Bio</div>
+    <div class="step-indicator" id="step-indicator">Etapa 1 de 6</div>
+  </header>
+
+  <main>
+    <div class="steps-container">
+
+      <!-- Step 0: Intro -->
+      <div class="step active" id="step-0" data-step="0">
+        <div class="step-badge">✨ Como funciona</div>
+        <h2>Em poucos minutos você recebe sua análise</h2>
+        <p class="step-desc">Vamos fazer <strong style="color:var(--fg)">6 perguntas</strong> rápidas para analisar sua bio seguindo o método MCI da Buzina Digital.</p>
+
+        <ul class="intro-list">
+          <li><span class="num">1</span> <span>Cole sua bio atual do Instagram</span></li>
+          <li><span class="num">2</span> <span>Responda 4 perguntas sobre você e seu público</span></li>
+          <li><span class="num">3</span> <span>Receba uma nota de 0 a 10 com análise visual</span></li>
+          <li><span class="num">4</span> <span>Ganhe 3 sugestões de bio prontas para usar</span></li>
+          <li><span class="num">5</span> <span>Tudo enviado no seu e-mail também</span></li>
+        </ul>
+
+        <div class="nav-row">
+          <button class="btn-next" onclick="nextStep()">Começar →</button>
+        </div>
+      </div>
+
+      <!-- Step 1: Bio atual + Instagram -->
+      <div class="step" id="step-1" data-step="1">
+        <div class="step-badge">📝 Etapa 1</div>
+        <h2>Sua bio atual</h2>
+        <p class="step-desc">Cole a sua bio do Instagram exatamente como está hoje. Não precisa ser perfeita, é isso que vamos analisar.</p>
+
+        <div class="field">
+          <label for="bio-atual">Bio atual do Instagram</label>
+          <textarea id="bio-atual" rows="4" placeholder="Cole aqui sua bio atual…" maxlength="500" oninput="updateCharCount('bio-atual','bio-count',150)"></textarea>
+          <div class="char-count" id="bio-count">0 / 150 caracteres (limite do Instagram)</div>
+        </div>
+
+        <div class="field">
+          <label for="instagram">@ do seu Instagram</label>
+          <input type="text" id="instagram" placeholder="@seuuser (opcional)">
+        </div>
+
+        <div class="nav-row">
+          <button class="btn-back" onclick="prevStep()">← Voltar</button>
+          <button class="btn-next" onclick="nextStep()" id="btn-1">Próxima →</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Idade do público -->
+      <div class="step" id="step-2" data-step="2">
+        <div class="step-badge">👥 Etapa 2</div>
+        <h2>Quem você atende?</h2>
+        <p class="step-desc">Pense nas pessoas que mais se beneficiam do seu trabalho hoje.</p>
+
+        <div class="tip">
+          <span class="tip-icon">💡</span>
+          <span>Isso ajuda a avaliar se a linguagem da sua bio está adequada para o seu público.</span>
+        </div>
+
+        <div class="field">
+          <label for="idade-publico">Qual a idade média das pessoas que você atende?</label>
+          <input type="text" id="idade-publico" placeholder="Ex: 30 a 45 anos, mulheres empreendedoras">
+        </div>
+
+        <div class="nav-row">
+          <button class="btn-back" onclick="prevStep()">← Voltar</button>
+          <button class="btn-next" onclick="nextStep()">Próxima →</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Transformação -->
+      <div class="step" id="step-3" data-step="3">
+        <div class="step-badge">✨ Etapa 3</div>
+        <h2>O resultado do seu trabalho</h2>
+        <p class="step-desc">Pense nos depoimentos que você recebe. O que as pessoas dizem que mais as deixou felizes depois de passar pelo seu serviço?</p>
+
+        <div class="tip">
+          <span class="tip-icon">💡</span>
+          <span>Essa é a transformação real que você entrega. É o coração de uma bio poderosa.</span>
+        </div>
+
+        <div class="field">
+          <label for="transformacao">O que elas mais dizem que as deixou felizes?</label>
+          <textarea id="transformacao" rows="3" placeholder='Ex: "Finalmente me sinto segura para vender nas redes sociais" ou "Minha agenda lotou em 2 meses"'></textarea>
+        </div>
+
+        <div class="nav-row">
+          <button class="btn-back" onclick="prevStep()">← Voltar</button>
+          <button class="btn-next" onclick="nextStep()">Próxima →</button>
+        </div>
+      </div>
+
+      <!-- Step 4: Nicho -->
+      <div class="step" id="step-4" data-step="4">
+        <div class="step-badge">🎯 Etapa 4</div>
+        <h2>O que você faz, exatamente?</h2>
+        <p class="step-desc">Descreva com clareza seu nicho e atuação direta. Quanto mais específico, melhor a análise.</p>
+
+        <div class="field">
+          <label for="nicho">Seu nicho e atuação direta</label>
+          <textarea id="nicho" rows="3" placeholder="Ex: Sou nutricionista especializada em emagrecimento funcional para mulheres acima de 40 anos com histórico de dietas frustradas."></textarea>
+        </div>
+
+        <div class="nav-row">
+          <button class="btn-back" onclick="prevStep()">← Voltar</button>
+          <button class="btn-next" onclick="nextStep()">Próxima →</button>
+        </div>
+      </div>
+
+      <!-- Step 5: Elemento pessoal -->
+      <div class="step" id="step-5" data-step="5">
+        <div class="step-badge">💛 Etapa 5</div>
+        <h2>O toque humano da sua bio</h2>
+        <p class="step-desc">Uma informação pessoal e autêntica transforma uma bio de vendas em uma bio de conexão. Pode ser algo sobre sua família, sua história, um hobbie ou sua motivação.</p>
+
+        <div class="tip">
+          <span class="tip-icon">💡</span>
+          <span>Não precisa ser nada elaborado. Às vezes "Mãe de dois gatos" ou "Apaixonado por café e viagens" já humaniza muito a bio.</span>
+        </div>
+
+        <div class="field">
+          <label for="pessoal">Compartilhe algo bem pessoal sobre você</label>
+          <textarea id="pessoal" rows="3" placeholder="Ex: Mãe de dois filhos, amante de culinária italiana. Comecei nessa área depois de perder 20kg e mudar completamente minha relação com a comida."></textarea>
+        </div>
+
+        <div class="nav-row">
+          <button class="btn-back" onclick="prevStep()">← Voltar</button>
+          <button class="btn-next" onclick="enviar()" id="btn-enviar">Analisar minha bio →</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <p>
+      <strong>Analisando sua bio…</strong>
+      Aplicando o método MCI da Buzina Digital
+    </p>
+  </div>
+
+  <div class="error-toast" id="error-toast"></div>
+
+  <script>
+    // ── Estado ─────────────────────────────────────────────────
+    let currentStep = 0;
+    const totalSteps = 6; // steps 0 to 5
+
+    const STEPS_PROGRESS = [0, 16, 33, 50, 66, 83, 100];
+
+    // Redireciona se não veio do index
+    const nome  = sessionStorage.getItem('raiox_nome');
+    const email = sessionStorage.getItem('raiox_email');
+    if (!nome || !email) window.location.href = 'index.html';
+
+    function updateProgress() {
+      document.getElementById('progress-fill').style.width = STEPS_PROGRESS[currentStep] + '%';
+      const stepNum = currentStep === 0 ? '' : `Etapa ${currentStep} de 5`;
+      document.getElementById('step-indicator').textContent = currentStep === 0 ? 'Como funciona' : `Etapa ${currentStep} de 5`;
+    }
+
+    function showStep(n) {
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      document.getElementById('step-' + n).classList.add('active');
+      currentStep = n;
+      updateProgress();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function nextStep() {
+      if (currentStep === 1) {
+        const bio = document.getElementById('bio-atual').value.trim();
+        if (!bio) { showError('Por favor, cole sua bio atual.'); return; }
+      }
+      if (currentStep === 4) {
+        const nicho = document.getElementById('nicho').value.trim();
+        if (!nicho) { showError('Por favor, descreva seu nicho.'); return; }
+      }
+      if (currentStep < 5) showStep(currentStep + 1);
+    }
+
+    function prevStep() {
+      if (currentStep > 0) showStep(currentStep - 1);
+    }
+
+    function updateCharCount(fieldId, countId, limit) {
+      const val = document.getElementById(fieldId).value;
+      const countEl = document.getElementById(countId);
+      countEl.textContent = `${val.length} / ${limit} caracteres (limite do Instagram)`;
+      countEl.classList.toggle('over', val.length > limit);
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('error-toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 3500);
+    }
+
+    // ── Envio ───────────────────────────────────────────────────
+    async function enviar() {
+      const bio_atual     = document.getElementById('bio-atual').value.trim();
+      const instagram     = document.getElementById('instagram').value.trim().replace('@', '');
+      const idade_publico = document.getElementById('idade-publico').value.trim();
+      const transformacao = document.getElementById('transformacao').value.trim();
+      const nicho         = document.getElementById('nicho').value.trim();
+      const pessoal       = document.getElementById('pessoal').value.trim();
+
+      if (!bio_atual) { showError('Bio atual é obrigatória.'); return; }
+      if (!nicho)     { showError('Descreva seu nicho.'); return; }
+
+      document.getElementById('loading-overlay').classList.add('show');
+
+      try {
+        const resp = await fetch('/api/analisar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nome, email, bio_atual, instagram, idade_publico, transformacao, nicho, pessoal }),
+        });
+
+        const data = await resp.json();
+
+        if (!resp.ok) throw new Error(data.error || 'Erro desconhecido');
+
+        // Salva resultado e redireciona
+        sessionStorage.setItem('raiox_resultado', JSON.stringify(data.resultado));
+        sessionStorage.setItem('raiox_cached', data.cached ? '1' : '0');
+        window.location.href = 'resultado.html';
+      } catch (err) {
+        document.getElementById('loading-overlay').classList.remove('show');
+        showError('Erro ao processar. Tente novamente em instantes.');
+        console.error(err);
+      }
+    }
+
+    updateProgress();
+  </script>
+</body>
+</html>
