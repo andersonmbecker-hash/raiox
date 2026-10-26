@@ -36,7 +36,36 @@ REGRAS ABSOLUTAS:
 - Seja criterioso nas notas. A maioria das bios tem problemas sérios. Nota 7 já é acima da média; 8 é excelente; 9 é rara.
 - A análise deve apontar especificamente o que falta ou prejudica a bio atual.
 
-Responda SOMENTE com JSON válido, sem texto antes ou depois, sem blocos de markdown.`;
+FORMATO DE RESPOSTA — use EXATAMENTE esta estrutura JSON, com estes nomes de campos (sem acentos nas chaves):
+
+{
+  "score_geral": 6.5,
+  "notas": {
+    "comunicacao": 7.0,
+    "identificacao": 6.0,
+    "clareza": 6.5
+  },
+  "analise": "Parágrafo único com a análise crítica da bio atual, apontando o que falta e por quê a nota ficou nesse nível.",
+  "sugestoes": [
+    {
+      "tipo": "Instagram",
+      "subtitulo": "Direta e com CTA",
+      "texto": "Texto da bio sugerida para Instagram (máximo 150 caracteres, 3 frases: o que faz, para quem, CTA)."
+    },
+    {
+      "tipo": "LinkedIn",
+      "subtitulo": "Completa e profissional",
+      "texto": "Texto da bio sugerida para LinkedIn (até 300 caracteres, mais elaborada)."
+    },
+    {
+      "tipo": "Completa",
+      "subtitulo": "Para site ou portfólio",
+      "texto": "Texto da bio completa para usar em site, apresentações ou portfólio (sem limite de caracteres)."
+    }
+  ]
+}
+
+Responda SOMENTE com o JSON acima, sem texto antes ou depois, sem blocos de markdown.`;
 
 // ── Email HTML ──────────────────────────────────────────────────
 function buildEmailHTML(nome, resultado) {
@@ -201,13 +230,27 @@ Instagram: ${instagram ? '@' + instagram.replace('@', '') : 'Não informado'}
     return res.status(500).json({ error: 'Falha ao processar análise. Tente novamente.' });
   }
 
-  // Garantir score_geral
+  // Normalizar campos — a IA pode usar nomes com ou sem acento
+  // notas: aceita "comunicação", "identificação", "clareza" ou sem acento
+  if (resultado.notas) {
+    const n = resultado.notas;
+    resultado.notas = {
+      comunicacao:  n.comunicacao  ?? n['comunicação']  ?? 5,
+      identificacao: n.identificacao ?? n['identificação'] ?? 5,
+      clareza:      n.clareza      ?? 5,
+    };
+  } else {
+    resultado.notas = { comunicacao: 5, identificacao: 5, clareza: 5 };
+  }
+  // sugestoes: aceita "sugestoes" ou "sugestões"
+  resultado.sugestoes = resultado.sugestoes ?? resultado['sugestões'] ?? [];
+  // analise: aceita "analise" ou "análise"
+  resultado.analise = resultado.analise ?? resultado['análise'] ?? '';
+  // score_geral: calcula se ausente ou inválido
   if (!resultado.score_geral || typeof resultado.score_geral !== 'number') {
-    const { comunicacao = 5, identificacao = 5, clareza = 5 } = resultado.notas || {};
+    const { comunicacao = 5, identificacao = 5, clareza = 5 } = resultado.notas;
     resultado.score_geral = Math.round(((comunicacao + identificacao + clareza) / 3) * 10) / 10;
   }
-  // Garantir notas
-  resultado.notas = resultado.notas || { comunicacao: 5, identificacao: 5, clareza: 5 };
 
   // ── Salvar no Supabase ───────────────────────────────────────
   const { error: dbErr } = await supabase
